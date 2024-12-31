@@ -1,6 +1,6 @@
 import os
 import glob
-from data import common
+from src.data import common
 import numpy as np
 import torch.utils.data as data
 
@@ -22,7 +22,6 @@ class SRData(data.Dataset):
         if train:
             n_patches = args.batch_size * args.test_every  # args.batch_size: 16, args.test_every: 1000
             self.repeat = max(n_patches // len(self.images_hr), 1) if len(self.images_hr) > 0 else 0
-
 
     # Below functions as used to prepare images
     def _scan(self):
