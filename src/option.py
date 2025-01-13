@@ -10,7 +10,7 @@ parser.add_argument('--debug', action='store_true',
 parser.add_argument('--n_threads', type=int, default=6,
                     help='number of threads for data loading')
 parser.add_argument('--cpu', action='store_true',
-                    help='use cpu only')
+                    help='use cpu only', default=True)
 
 # Model specifications
 parser.add_argument('--model', default='unet',

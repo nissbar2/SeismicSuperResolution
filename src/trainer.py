@@ -36,7 +36,7 @@ class Trainer():
         )
         self.loss.start_log()
         self.model.train()
-        device = torch.device('mps')
+        device = torch.device('cpu')
 
         timer_data, timer_model = src.utility.timer(), src.utility.timer()
         # TEMP
@@ -87,6 +87,7 @@ class Trainer():
         scale = self.args.scale
         timer_test =src.utility.timer()
         if self.args.save_results: self.ckp.begin_background()
+        self.deme_lovto()
         for (lr, hr, filename, params) in tqdm(self.loader_test, ncols=80):
             lr, hr = self.prepare(lr, hr)
             sr = self.model(lr)
@@ -102,14 +103,15 @@ class Trainer():
             # Assuming lr_img_array, sr_img_array, and hr_img_array are numpy arrays with values in the range [0, 1]
             lr_img = Image.fromarray((lr_img_array * 255).astype(np.uint8), mode='L')
             sr_img = Image.fromarray((sr_img_array * 255).astype(np.uint8), mode='L')
-            lr_img.show()
-            sr_img.show()
+            # lr_img.show()
+            # sr_img.show()
             lr_img.save(f"{filename}lr.png")
             sr_img.save(f"{filename}sr.png")
 
             # Convert PIL images to numpy arrays for plotting
             lr_img_array = np.array(lr_img)
             sr_img_array = np.array(sr_img)
+            np.save(f"{filename}lr.npy", lr_img_array)
 
             # Create a figure and a set of subplots
             fig, axs = plt.subplots(1, 2, figsize=(10, 5))
@@ -173,7 +175,7 @@ class Trainer():
         torch.set_grad_enabled(True)
 
     def prepare(self, *args):
-        device = torch.device('mps')
+        device = torch.device('cpu')
         return [a.to(device) for a in args]
 
     def terminate(self):
@@ -184,12 +186,12 @@ class Trainer():
         # self.model.eval()
 
         # Load and prepare the image
-        image = np.fromfile("../data/field/american_egret_npy/output.npy", dtype=np.float32)
+        image = np.load("../data/field/output.npy").astype(np.float32)
         # image = np.load("../data/field/american_egret_npy/output.npy").astype(np.float32)
-        image = torch.from_numpy(image).float()
-
+        # image = torch.from_numpy(image).float()
+        image = torch.from_numpy(image)
         # Ensure the image has 4 dimensions [batch_size, channels, height, width]
-        if image.dim() == 2:  # Single channel 2D image
+        if image.ndim == 2:  # Single channel 2D image
             image = image.unsqueeze(0).unsqueeze(0)  # Add batch and channel dimensions
 
         # Randomly generated high-resolution image
@@ -234,7 +236,7 @@ import torchvision.transforms as transforms
 
 
 def inference_single_image(model, image_path):
-    device = torch.device('mps')
+    device = torch.device('cpu')
     model.eval()
 
     # Load and preprocess image
