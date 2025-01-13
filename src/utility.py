@@ -16,6 +16,19 @@ import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lrs
 
+
+def bg_target(queue):
+    """
+    Function to process the queue in the background.
+    """
+    while True:
+        if not queue.empty():
+            filename, tensor = queue.get()
+            if filename is None:
+                break
+            imageio.imwrite(filename, tensor.numpy())
+
+
 class timer():
     def __init__(self):
         self.acc = 0
@@ -128,20 +141,13 @@ class checkpoint():
         # Queue是python标准库中的线程安全的队列（FIFO）实现,
         # 提供了一个适用于多线程编程的先进先出的数据结构，即队列
         self.queue = Queue()
-
-        def bg_target(queue):
-            while True:
-                if not queue.empty():
-                    filename, tensor = queue.get()
-                    if filename is None: break
-                    imageio.imwrite(filename, tensor.numpy())
-        
         self.process = [
             Process(target=bg_target, args=(self.queue,)) \
             for _ in range(self.n_processes)
         ]
-        
-        for p in self.process: p.start()
+
+        for p in self.process:
+            p.start()
 
     def end_background(self):
         for _ in range(self.n_processes): self.queue.put((None, None))
