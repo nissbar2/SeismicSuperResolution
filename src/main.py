@@ -1,4 +1,5 @@
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
 import torch
 import numpy as np
 import utility
@@ -7,7 +8,6 @@ import model
 import loss
 from option import args
 from trainer import Trainer
-os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
 
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed_all(args.seed)
