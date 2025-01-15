@@ -84,16 +84,16 @@ def read_segy_data(segy_file):
 
 if __name__ == '__main__':
     # Load the SEGY file
-    # segy_file = "../data/field/american_egret_npy/sliced_seismic_data4.segy"
+    # segy_file = "../data/field/sliced_seismic_data4.segy"
     # data = read_segy_data(segy_file)
     #
     # # Convert to numpy array and slice to 300x200
-    # patch = np.array(data)[200:500, 200:400]  # Ensure this gives the desired shape (300x200)
+    # patch = np.array(data)[200:500, 200:400].T  # Ensure this gives the desired shape (300x200)
     #
     # # Convert to an image using PIL
-    # sr_img_array = Image.fromarray(data, mode='L')
+    # sr_img_array = Image.fromarray(patch, mode='L')
     # # Save as NPY file
-    # np.save("../data/field/american_egret_npy/output.npy", patch)
+    # np.save("../data/field/output.npy", patch)
     # # Save as image
     # plt.figure(figsize=(10, 6))
     # plt.imshow(patch, cmap='seismic', aspect='auto')
@@ -101,8 +101,9 @@ if __name__ == '__main__':
     # plt.title('Seismic Patch')
     # plt.xlabel('Trace')
     # plt.ylabel('Time/Depth')
-    # plt.savefig("300*200.png", dpi=100, bbox_inches='tight')
+    # plt.savefig("300_200.png", dpi=100, bbox_inches='tight')
     # plt.close()
+
 
     # # Visualization of raw data
     # # fig = plt.figure(figsize=(18, 9))
@@ -120,4 +121,11 @@ if __name__ == '__main__':
     main()
     # image = np.load("../data/field/american_egret_npy/output.npy")
     # sr = model.Model.model(image)
+
+    # CHECK
+    # my_data = np.load('../data/field/output.npy')
+    # their_data = np.fromfile("../data/field\lulia_592x400.dat", dtype=np.float32)
+    # print(my_data.shape, my_data.min(), my_data.max())
+    # print(their_data.shape, their_data.min(), their_data.max())
+
 

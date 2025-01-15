@@ -5,6 +5,7 @@ import torch.nn.utils as utils
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
+import src.data.common as common
 from PIL import Image
 
 class Trainer():
@@ -90,8 +91,9 @@ class Trainer():
         self.deme_lovto()
         for (lr, hr, filename, params) in tqdm(self.loader_test, ncols=80):
             lr, hr = self.prepare(lr, hr)
+            print(filename," lr: shape: ", lr.shape, " min: " ,torch.min(lr), " max: ", torch.max(lr))
             sr = self.model(lr)
-
+            print(filename, " sr: shape: ", sr.shape, " min: " ,torch.min(sr), " max: ", torch.max(sr))
             # Assuming `lr` and `sr` are single-channel images for mode 'L'
             lr_img_array = lr.cpu().numpy()[0][0]  # Get the first channel if multi-channel
             sr_img_array = sr.cpu().numpy()[0][0]
@@ -189,7 +191,8 @@ class Trainer():
         image = np.load("../data/field/output.npy").astype(np.float32)
         # image = np.load("../data/field/american_egret_npy/output.npy").astype(np.float32)
         # image = torch.from_numpy(image).float()
-        image = torch.from_numpy(image)
+        image, _ = common.normal(image, image)
+        image = torch.from_numpy(image[0])
         # Ensure the image has 4 dimensions [batch_size, channels, height, width]
         if image.ndim == 2:  # Single channel 2D image
             image = image.unsqueeze(0).unsqueeze(0)  # Add batch and channel dimensions
@@ -206,24 +209,14 @@ class Trainer():
             lr = lr.unsqueeze(0).unsqueeze(0)  # Add batch and channel dimensions
 
         # Pass through the model
+        print("DEMI lr: shape: ", lr.shape, " min: ", torch.min(lr), " max: ", torch.max(lr))
         sr = self.model(lr)
+        print("DEMI sr: shape: ", sr.shape, " min: ", torch.min(sr), " max: ", torch.max(sr))
         # lr_img_array = lr.cpu().numpy()[0][0]
         # Assuming 'sr' is a tensor, visualize it using matplotlib
         sr_img = sr.cpu().numpy()[0][0]
         # sr_img = sr.squeeze().detach().cpu().numpy()
-        sr_img_array = Image.fromarray((sr_img * 255).astype(np.uint8), mode='L')
-        sr_img_array.show()
-        npy_sr = np.array(sr_img_array)
-
-        # Plot each image
-        plt.imshow(npy_sr, cmap='gray')
-        plt.title('Super Resolution (SR)')
-        plt.axis('off')  # Hide axis
-
-        # Display the plot
-        plt.tight_layout()
-        plt.savefig(f"yalla.png")
-        plt.close()
+        show_save_two_images(lr,sr)
 
         # # plt.imshow(sr.squeeze().detach().cpu().numpy(), cmap='gray')   # Adjust if needed
         # plt.savefig("output_image.png")  # Save the image to a file
@@ -256,6 +249,45 @@ def inference_single_image(model, image_path):
     sr_image = to_pil(sr_tensor.squeeze().cpu())
 
     return sr_image
+
+def show_save_two_images(lr, sr, filename='output.png', mode='L'):
+    # Assuming `lr` and `sr` are single-channel images for mode 'L'
+    lr_img_array = lr.cpu().numpy()[0][0]  # Get the first channel if multi-channel
+    sr_img_array = sr.cpu().numpy()[0][0]
+
+    # Convert arrays to images
+    # lr_img = np.fromfile()
+
+    # Assuming lr_img_array, sr_img_array, and hr_img_array are numpy arrays with values in the range [0, 1]
+    lr_img = Image.fromarray((lr_img_array * 255).astype(np.uint8), mode='L')
+    sr_img = Image.fromarray((sr_img_array * 255).astype(np.uint8), mode='L')
+    # lr_img.show()
+    # sr_img.show()
+    lr_img.save(f"{filename}lr.png")
+    sr_img.save(f"{filename}sr.png")
+
+    # Convert PIL images to numpy arrays for plotting
+    lr_img_array = np.array(lr_img)
+    sr_img_array = np.array(sr_img)
+    np.save(f"{filename}lr.npy", lr_img_array)
+
+    # Create a figure and a set of subplots
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+
+    # Plot each image
+    axs[0].imshow(lr_img_array, cmap='gray')
+    axs[0].set_title('Low Resolution (LR)')
+    axs[0].axis('off')  # Hide axis
+
+    axs[1].imshow(sr_img_array, cmap='gray')
+    axs[1].set_title('Super Resolution (SR)')
+    axs[1].axis('off')  # Hide axis
+
+    # Display the plot
+    plt.tight_layout()
+    plt.savefig(f"{filename}.png")
+
+    plt.close()
 
 
 # Example usage:

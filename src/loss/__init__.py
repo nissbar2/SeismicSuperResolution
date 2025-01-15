@@ -1,5 +1,5 @@
 import os
-from loss import msssim
+from src.loss import msssim
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -112,7 +112,7 @@ class Loss(nn.modules.loss._Loss):
         if self.n_GPUs == 1:
             return self.loss_module
         else:
-            return self.loss_module.module
+            return self.loss_module
 
     def save(self, apath):
         torch.save(self.state_dict(), os.path.join(apath, 'loss.pt' if self.m == 'train' else 'lossv.pt'))

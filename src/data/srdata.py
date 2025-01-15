@@ -1,6 +1,6 @@
 import os
 import glob
-from data import common
+from src.data import common
 import numpy as np
 import torch.utils.data as data
 
