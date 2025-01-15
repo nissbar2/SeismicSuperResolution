@@ -6,6 +6,7 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 import src.data.common as common
+import pandas as pd
 from PIL import Image
 
 class Trainer():
@@ -294,3 +295,47 @@ def show_save_two_images(lr, sr, filename='output.png', mode='L'):
 def process_image(model_instance, input_image_path, output_image_path):
     sr_image = inference_single_image(model_instance.model, input_image_path)
     sr_image.save(output_image_path)
+
+
+def show_fourier2d_2_images(data1, data2):
+    fft1 = np.fft.fft2(data1)
+    fft2 = np.fft.fft2(data2)
+
+    # Compute the magnitude spectrum (amplitude)
+    magnitude1 = np.abs(fft1)
+    magnitude2 = np.abs(fft2)
+
+    # Combine the two spectra side by side
+    combined_spectrum = np.hstack((magnitude1, magnitude2))
+
+    # Create frequency indices
+    freq_u = np.fft.fftfreq(data1.shape[0])  # Frequency indices for rows
+    freq_v = np.fft.fftfreq(data2.shape[1])  # Frequency indices for columns
+
+    # Create a grid of frequency indices
+    freq_u_grid, freq_v_grid = np.meshgrid(freq_u, freq_v, indexing="ij")
+
+    # Flatten and create a 2D table
+    rows = []
+    for i in range(combined_spectrum.shape[0]):
+        for j in range(combined_spectrum.shape[1]):
+            rows.append({
+                "u (row freq)": freq_u_grid[i % data1.shape[0], j % data1.shape[1]],
+                "v (col freq)": freq_v_grid[i % data1.shape[0], j % data1.shape[1]],
+                "Magnitude (Matrix 1)": magnitude1[i % data1.shape[0], j % data1.shape[1]],
+                "Magnitude (Matrix 2)": magnitude2[i % data2.shape[0], j % data2.shape[1]]
+            })
+
+    table = pd.DataFrame(rows)
+
+    # Save the table to CSV (optional)
+    table.to_csv("combined_spectrum_table.csv", index=False)
+
+    # Display first few rows of the table
+    print(table.head())
+
+    # Optional: Visualize the combined spectrum
+    plt.imshow(np.log1p(combined_spectrum), cmap="viridis")
+    plt.title("Log Combined Fourier Spectrum")
+    plt.colorbar()
+    plt.show()

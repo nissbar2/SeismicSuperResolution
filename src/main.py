@@ -14,6 +14,7 @@ from trainer import Trainer
 import segyio
 import matplotlib.pyplot as plt
 from PIL import Image
+import pandas as pd
 
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed_all(args.seed)
@@ -82,6 +83,46 @@ def read_segy_data(segy_file):
     return traces
 
 
+def show_fourier2d_2_images(matrix1, matrix2):
+    fft1 = np.fft.fft2(matrix1)
+    fft2 = np.fft.fft2(matrix2)
+
+    # Shift the zero-frequency component to the center
+    fft1_shifted = np.fft.fftshift(fft1)
+    fft2_shifted = np.fft.fftshift(fft2)
+
+    # Compute the magnitude spectrum
+    magnitude1 = np.abs(fft1_shifted)
+    magnitude2 = np.abs(fft2_shifted)
+
+    # Log-transform the magnitudes for better visualization
+    log_magnitude1 = np.log1p(magnitude1)
+    log_magnitude2 = np.log1p(magnitude2)
+
+    # Plot the Fourier spectra side by side
+    plt.figure(figsize=(12, 6))
+
+    # Spectrum of the first matrix
+    plt.subplot(1, 2, 1)
+    plt.imshow(log_magnitude1, cmap="viridis", extent=(-0.5, 0.5, -0.5, 0.5))
+    plt.title("Fourier Spectrum: Matrix 1")
+    plt.xlabel("Frequency (u)")
+    plt.ylabel("Frequency (v)")
+    plt.colorbar(label="Log Magnitude")
+
+    # Spectrum of the second matrix
+    plt.subplot(1, 2, 2)
+    plt.imshow(log_magnitude2, cmap="viridis", extent=(-0.5, 0.5, -0.5, 0.5))
+    plt.title("Fourier Spectrum: Matrix 2")
+    plt.xlabel("Frequency (u)")
+    plt.ylabel("Frequency (v)")
+    plt.colorbar(label="Log Magnitude")
+
+    # Show the plot
+    plt.tight_layout()
+    plt.savefig("fourier_spectrum_side_by_side.png", dpi=300)
+
+
 if __name__ == '__main__':
     # Load the SEGY file
     # segy_file = "../data/field/sliced_seismic_data4.segy"
@@ -118,14 +159,19 @@ if __name__ == '__main__':
     # data = np.array(data, dtype=np.float32)
     # output_file = "../data/field/american_egret_npy/output.npy"
     # np.save(output_file, data)
-    main()
+    # main()
     # image = np.load("../data/field/american_egret_npy/output.npy")
     # sr = model.Model.model(image)
 
     # CHECK
-    # my_data = np.load('../data/field/output.npy')
+    my_data = np.load('../data/field/output.npy')
     # their_data = np.fromfile("../data/field\lulia_592x400.dat", dtype=np.float32)
     # print(my_data.shape, my_data.min(), my_data.max())
     # print(their_data.shape, their_data.min(), their_data.max())
+    show_fourier2d_2_images(my_data,my_data)
+
+
+
+
 
 
