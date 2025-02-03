@@ -15,7 +15,7 @@ class Model(nn.Module):
         self.n_GPUs = args.n_GPUs
         self.save_models = args.save_models
 
-        module = import_module('model.' + args.model.lower())
+        module = import_module('my_model.' + args.model.lower())
         self.model = module.make_model(args).to(self.device)
 
         self.load(

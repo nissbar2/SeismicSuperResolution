@@ -52,7 +52,7 @@ class ListModule(nn.Module):
         return len(self._modules)
 
 def make_model(args):
-    return UNet(feature_scale=args.feature_scale, scale=args.scale)
+    return UNet(n_input_channels=3, feature_scale=args.feature_scale, scale=args.scale)
 
 class UNet(nn.Module):
     def __init__(self, n_input_channels=1, n_output_channels=1, feature_scale=1, more_layers=0,

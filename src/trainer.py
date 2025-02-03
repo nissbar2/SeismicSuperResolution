@@ -89,11 +89,11 @@ class Trainer():
         scale = self.args.scale
         timer_test =src.utility.timer()
         if self.args.save_results: self.ckp.begin_background()
-        self.deme_lovto()
+        # self.deme_lovto()
         for (lr, hr, filename, params) in tqdm(self.loader_test, ncols=80):
             lr, hr = self.prepare(lr, hr)
             print(filename," lr: shape: ", lr.shape, " min: " ,torch.min(lr), " max: ", torch.max(lr))
-            sr = self.model(lr)
+            sr = self.model(lr.repeat(1,3,1,1))
             print(filename, " sr: shape: ", sr.shape, " min: " ,torch.min(sr), " max: ", torch.max(sr))
             # Assuming `lr` and `sr` are single-channel images for mode 'L'
             lr_img_array = lr.cpu().numpy()[0][0]  # Get the first channel if multi-channel
@@ -211,7 +211,7 @@ class Trainer():
 
         # Pass through the model
         print("DEMI lr: shape: ", lr.shape, " min: ", torch.min(lr), " max: ", torch.max(lr))
-        sr = self.model(lr)
+        sr = self.model(lr.repeat(1,3,1,1))
         print("DEMI sr: shape: ", sr.shape, " min: ", torch.min(sr), " max: ", torch.max(sr))
         # lr_img_array = lr.cpu().numpy()[0][0]
         # Assuming 'sr' is a tensor, visualize it using matplotlib

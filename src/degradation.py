@@ -85,13 +85,23 @@ def show_both(matrix1,matrix2, title="def"):
     plt.title("Matrix 2")
     plt.axis("off")
 
-    plt.savefig(f"{title}.png", dpi=300)
+    plt.show()
+    # plt.savefig(f"{title}.png", dpi=300)
+
+def show_one(matrix1, title="def"):
+    plt.imshow(matrix1, cmap='gray')
+    plt.title("Matrix 1")
+    plt.axis("off")  # Hide axes
+    plt.axis("off")
+    plt.show()
+    # plt.savefig(f"{title}.png", dpi=300)
 
 
 if __name__ == '__main__':
-    img = np.load('../data/field/output.npy')
-    print(img.shape)
-    img_resized = gaussian_resize_3d(img,img,img, scale=2)
-    print(img_resized.shape)
-    show_both(img,img_resized, title="gaussian3d_resize")
+    img_prev = np.load('../my_data/Isramco_N_C_1990_Z36N_AGC.npy')
+    img_cur = np.load('../my_data/Isramco_N_C_1991_Z36N_AGC.npy')
+    img_post = np.load('../my_data/Isramco_N_C_1992_Z36N_AGC.npy')
+    img_resized = gaussian_resize_3d(img_prev,img_cur,img_post, scale=2)
+    # print(img_resized.shape)
+    show_one(img_resized, title="curandnone")
 

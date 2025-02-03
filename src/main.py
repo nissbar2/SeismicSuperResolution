@@ -7,7 +7,7 @@ import torch
 import numpy as np
 import utility
 import data
-import model
+import my_model
 import loss
 from option import args
 from trainer import Trainer
@@ -22,7 +22,7 @@ np.random.seed(args.seed)
 
 
 def main():
-    global model
+    global my_model
 ############ Train ##############
     # args.test_only = False
     # args.save_results = False
@@ -38,39 +38,41 @@ def main():
     # checkpoint.done()
 
 # ############ Test synthetic data ##############
-#     print('test synthetic data')
-#     args.test_only = True
-#     args.save_results = True
-#     args.pre_train = '../experiment/alpha6/model/model_best.pt'
-#     args.data_range = '1-1200/1451-1600'
-#     checkpoint = utility.checkpoint(args)
-#     loader = data.Data(args)
-#     _model = model.Model(args, checkpoint)
-#
-#     t = Trainer(args, loader, _model, ckp=checkpoint)
-#     t.test()
-#
-#     checkpoint.done()
-
-########### Test2 ##############
-    print("test field data")
+    print('test synthetic data')
     args.test_only = True
-    args.save_dir_suffix = 'field'
-    args.data_range = '1-1200/1451-1453'
-    args.dir_lr = '../data/field/'
-    args.apply_field_data = True
-    args.pre_train = '../experiment/alpha6/model/model_best.pt'
+    args.save_results = True
+    args.pre_train = '../experiment/alpha6/model/my_model_weights.pt'
+    args.data_range = '1-1200/1451-1600'
     checkpoint = utility.checkpoint(args)
     loader = data.Data(args)
-    _model = model.Model(args, checkpoint)
+    _model = my_model.Model(args, checkpoint)
 
     t = Trainer(args, loader, _model, ckp=checkpoint)
+    t.test()
+
+    checkpoint.done()
+
+########### Test2 ##############
+    # print("test field data")
+    # args.test_only = True
+    # args.save_dir_suffix = 'field'
+    # args.data_range = '1-1200/1451-1453'
+    # args.dir_lr = '../data/field/'
+    # args.apply_field_data = True
+    # args.pre_train = '../experiment/alpha6/model/my_model_weights.pt'
+    # checkpoint = utility.checkpoint(args)
+    # loader = data.Data(args)
+    # _model = my_model.Model(args, checkpoint) # TODO Wont work until first layer is 3 channels
+    # t = Trainer(args, loader, _model, ckp=checkpoint)
+    # t.test()
+    # return
+
     # p = np.loadtxt('../experiment/alpha6/model/0000.dat')
     # print()
     #
     # process_image(t, p, '../data/nx2/00.png')
 
-    t.test()
+    # t.test()
     # t.deme_lovto()
     checkpoint.done()
 
@@ -122,8 +124,26 @@ def show_fourier2d_2_images(matrix1, matrix2):
     plt.tight_layout()
     plt.savefig("fourier_spectrum_side_by_side.png", dpi=300)
 
+def load_trained_model_1_to_3(pre_train_path):
+    weights = torch.load(pre_train_path, map_location=torch.device("cpu"))
+    conv_weight_key = "start.conv1.0.0.weight"
+    conv_bias_key = "start.conv1.0.0.bias"
+    print(f"Shape of {conv_weight_key}: {weights[conv_weight_key].shape}")
+    old_weights = weights[conv_weight_key]
+    new_weights = old_weights.repeat(1, 3, 1, 1) / 3
+    weights[conv_weight_key] = new_weights
+    if conv_bias_key in weights:
+        weights[conv_bias_key] = weights[conv_bias_key].clone()
+    # Save the updated weights
+    print(f"Shape of {conv_weight_key}: {weights[conv_weight_key].shape}")
+    new_checkpoint_path = "../experiment/alpha6/model/my_model_weights.pt"
+    torch.save(weights, new_checkpoint_path)
+
+    print(f"Modified weights saved to {new_checkpoint_path}")
+
 
 if __name__ == '__main__':
+    main()
     # Load the SEGY file
     # segy_file = "../data/field/sliced_seismic_data4.segy"
     # data = read_segy_data(segy_file)
@@ -164,11 +184,11 @@ if __name__ == '__main__':
     # sr = model.Model.model(image)
 
     # CHECK
-    my_data = np.load('../data/field/output.npy')
+    # my_data = np.load('../data/field/output.npy')
     # their_data = np.fromfile("../data/field\lulia_592x400.dat", dtype=np.float32)
     # print(my_data.shape, my_data.min(), my_data.max())
     # print(their_data.shape, their_data.min(), their_data.max())
-    show_fourier2d_2_images(my_data,my_data)
+    # show_fourier2d_2_images(my_data,my_data)
 
 
 
