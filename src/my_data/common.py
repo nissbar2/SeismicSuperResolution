@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 def get_patch(*args, patch_size=48, scale=2):
-    ih, iw = args[0].shape[:2]
+    ih, iw = args[0].shape[1:3]
 
     ip = patch_size
     tp = ip * scale
@@ -14,18 +14,18 @@ def get_patch(*args, patch_size=48, scale=2):
     tx, ty = scale * ix, scale * iy
 
     ret = [
-        args[0][iy:iy + ip, ix:ix + ip, :],
-        *[a[ty:ty + tp, tx:tx + tp, :] for a in args[1:]]
+        args[0][:,iy:iy + ip, ix:ix + ip, :],
+        *[a[:,ty:ty + tp, tx:tx + tp, :] for a in args[1:]]
     ]
 
     return ret
 
 def set_channel(*args):
-    return [np.expand_dims(a, axis=2) for a in args]
+    return [np.expand_dims(a, axis=3) for a in args]
 
 def np2Tensor(*args):
     def _np2Tensor(img):
-        np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
+        np_transpose = np.ascontiguousarray(img.transpose((3, 0, 1, 2)))
         tensor = torch.from_numpy(np_transpose).float()
         return tensor
 
@@ -37,9 +37,9 @@ def augment(*args, hflip=True, rot=True):
     rot90 = rot and random.random() < 0.5
 
     def _augment(img):
-        if hflip: img = img[:, ::-1, :]
-        if vflip: img = img[::-1, :, :]
-        if rot90: img = img.transpose(1, 0, 2)
+        if hflip: img = img[:,:, ::-1, :]
+        if vflip: img = img[:,::-1, :, :]
+        if rot90: img = np.rot90(img, k=1, axes=(1, 2))
         
         return img
 

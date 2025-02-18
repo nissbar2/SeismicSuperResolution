@@ -41,15 +41,15 @@ parser.add_argument('--resume', type=int, default=0,
 parser.add_argument('--apply_field_data', type=bool, default=False)
 parser.add_argument('--dir_data_root', type=str, default='../data/',
                     help='root directory of dataset')
-parser.add_argument('--dir_lr', type=str, default='nx2',
+parser.add_argument('--dir_lr', type=str, default='my_nx2',
                     help='if synthetic data, like this: dir_data_root/dir_lr.   '+
                     'if field data, dir_lr is the absolute path of field data.')
-parser.add_argument('--dir_hr', type=str, default='sx',
+parser.add_argument('--dir_hr', type=str, default='my_sx',
                     help='like this: dir_data_root/dir_hr.')
 parser.add_argument('--save_dir_suffix', type=str, default='syn',
                     help='save test result as: result-(save_dir_suffix)/, such as result-syn/')
 
-parser.add_argument('--data_range', type=str, default='1-1200/1301-1450',
+parser.add_argument('--data_range', type=str, default='1-150/151-194',
                     help='train/test data range')
 parser.add_argument('--scale', type=int, default=2,
                     help='super resolution scale')
@@ -74,7 +74,7 @@ parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
 parser.add_argument('--test_only', type=bool, default=False,
                     help='set this option to test the model')
-parser.add_argument('--n_GPUs', type=int, default=2,
+parser.add_argument('--n_GPUs', type=int, default=0,
                     help='number of GPUs')
 
 args = parser.parse_args()

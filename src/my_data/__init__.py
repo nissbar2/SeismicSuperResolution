@@ -1,4 +1,4 @@
-from src.data import srdata
+from src.my_data import srdata
 from torch.utils.data import dataloader
 
 class Data:
