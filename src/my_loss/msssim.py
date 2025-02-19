@@ -71,8 +71,6 @@ def ssim(img1, img2, window_size=11, window=None, size_average=True, full=False,
 
 def msssim(img1, img2, window_size=11, size_average=True, val_range=None, normalize=True):
     device = img1.device
-    if img2.shape[1] > 1:
-        img2 = img2[:, 1:2, :, :]
     weights = torch.FloatTensor([0.0448, 0.2856, 0.3001, 0.2363, 0.1333]).to(device)
     levels = weights.size()[0]
     mssim = []

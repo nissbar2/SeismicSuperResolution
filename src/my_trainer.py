@@ -93,9 +93,7 @@ class Trainer():
         # self.deme_lovto()
         for (lr, hr, filename, params) in tqdm(self.loader_test, ncols=80):
             lr, hr = self.prepare(lr, hr)
-            print(filename," lr: shape: ", lr.shape, " min: " ,torch.min(lr), " max: ", torch.max(lr))
             sr = self.model(lr)
-            print(filename, " sr: shape: ", sr.shape, " min: " ,torch.min(sr), " max: ", torch.max(sr))
             # Assuming `lr` and `sr` are single-channel images for mode 'L'
             lr_img_array = lr.cpu().numpy()[0][0]  # Get the first channel if multi-channel
             sr_img_array = sr.cpu().numpy()[0][0]

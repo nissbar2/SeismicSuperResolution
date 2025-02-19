@@ -54,6 +54,8 @@ class Loss(nn.modules.loss._Loss):
 
     def forward(self, sr, hr):
         losses = []
+        if hr.shape[1] > 1:
+            hr = hr[:, 1:2, :, :]
         for i, l in enumerate(self.loss):
             if l['function'] is not None:
                 loss = l['function'](sr, hr)
