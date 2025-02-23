@@ -19,7 +19,7 @@ import pandas as pd
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed_all(args.seed)
 np.random.seed(args.seed)
-
+my_device  = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def main():
     global my_model
@@ -125,7 +125,7 @@ def show_fourier2d_2_images(matrix1, matrix2):
     plt.savefig("fourier_spectrum_side_by_side.png", dpi=300)
 
 def load_trained_model_1_to_3(pre_train_path):
-    weights = torch.load(pre_train_path, map_location=torch.device("cpu"))
+    weights = torch.load(pre_train_path, map_location=my_device)
     conv_weight_key = "start.conv1.0.0.weight"
     conv_bias_key = "start.conv1.0.0.bias"
     print(f"Shape of {conv_weight_key}: {weights[conv_weight_key].shape}")

@@ -10,7 +10,7 @@ parser.add_argument('--debug', action='store_true',
 parser.add_argument('--n_threads', type=int, default=6,
                     help='number of threads for data loading')
 parser.add_argument('--cpu', action='store_true',
-                    help='use cpu only', default=True)
+                    help='use cpu only', default=False)
 
 # Model specifications
 parser.add_argument('--model', default='unet',
@@ -74,7 +74,7 @@ parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
 parser.add_argument('--test_only', type=bool, default=False,
                     help='set this option to test the model')
-parser.add_argument('--n_GPUs', type=int, default=0,
+parser.add_argument('--n_GPUs', type=int, default=1,
                     help='number of GPUs')
 
 args = parser.parse_args()

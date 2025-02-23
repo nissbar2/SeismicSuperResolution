@@ -9,6 +9,8 @@ import src.data.common as common
 import pandas as pd
 from PIL import Image
 
+my_device  = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 class Trainer():
     def __init__(self, args, loader, my_model,
                  my_loss=None, my_lossv=None, ckp=None):
@@ -38,7 +40,7 @@ class Trainer():
         )
         self.loss.start_log()
         self.model.train()
-        device = torch.device('cpu')
+        device = my_device
 
         timer_data, timer_model = src.utility.timer(), src.utility.timer()
         # TEMP
@@ -177,7 +179,7 @@ class Trainer():
         torch.set_grad_enabled(True)
 
     def prepare(self, *args):
-        device = torch.device('cpu')
+        device = my_device
         return [a.to(device) for a in args]
 
     def terminate(self):
@@ -229,7 +231,7 @@ import torchvision.transforms as transforms
 
 
 def inference_single_image(model, image_path):
-    device = torch.device('cpu')
+    device = my_device
     model.eval()
 
     # Load and preprocess image
