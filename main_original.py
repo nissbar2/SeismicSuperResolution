@@ -3,11 +3,11 @@ import os
 import torch
 import numpy as np
 import src.utility as utility
-import src.my_data as data
-import src.my_model as my_model
-import src.my_loss as my_loss
+import src.data as data
+import src.model as model
+import src.loss as loss
 from src.option import args
-from src.my_trainer import Trainer
+from src.trainer import Trainer
 import segyio
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -19,16 +19,16 @@ np.random.seed(args.seed)
 my_device  = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def main():
-    global my_model
+    global model
 ############ Train ##############
     args.test_only = False
     args.save_results = False
     args.pre_train = 'experiment/alpha6/model/model_best.pt'
     checkpoint = utility.checkpoint(args)
     loader = data.Data(args)
-    _model = my_model.Model(args, checkpoint)
-    _loss = my_loss.Loss(args, checkpoint)
-    _lossv = my_loss.Loss(args, checkpoint, m='validation')
+    _model = model.Model(args, checkpoint)
+    _loss = loss.Loss(args, checkpoint)
+    _lossv = loss.Loss(args, checkpoint, m='validation')
     t = Trainer(args, loader, _model, _loss, _lossv, checkpoint)
     while not t.terminate():
         t.train()
@@ -134,7 +134,7 @@ def load_trained_model_1_to_3(pre_train_path):
         weights[conv_bias_key] = weights[conv_bias_key].clone()
     # Save the updated weights
     print(f"Shape of {conv_weight_key}: {weights[conv_weight_key].shape}")
-    new_checkpoint_path = "experiment/alpha6/model/my_model_weights3d.pt"
+    new_checkpoint_path = "experiment/alpha6/model/my_model_weights.pt"
     torch.save(weights, new_checkpoint_path)
 
     print(f"Modified weights saved to {new_checkpoint_path}")

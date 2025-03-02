@@ -10,7 +10,7 @@ class SRData(data.Dataset):
         self.train = train
         self.scale = args.scale
         # self.arr = self.get_arr()
-        self.arr = np.fromfile('data/arr.dat', dtype=int)
+        self.arr = np.arange(0, 389) # np.fromfile('data/arr.dat', dtype=int)
 
         data_range = [r.split('-') for r in args.data_range.split('/')] # ex: self.data_range: 1-400/401-432
         data_range = data_range[0] if train else data_range[1]
@@ -26,8 +26,8 @@ class SRData(data.Dataset):
 
     # Below functions as used to prepare images
     def _scan(self):
-        names_hr = sorted(glob.glob(os.path.join(self.dir_hr, '*.dat')))
-        names_lr = sorted(glob.glob(os.path.join(self.dir_lr, '*.dat')))
+        names_hr = sorted(glob.glob(os.path.join(self.dir_hr, '*.npy')))
+        names_lr = sorted(glob.glob(os.path.join(self.dir_lr, '*.npy')))
         
         names_hr = np.array(names_hr)[self.arr] # shuffle
         names_hr = names_hr[self.begin - 1: self.end]
@@ -41,10 +41,10 @@ class SRData(data.Dataset):
         return names_hr, names_lr
 
     def _set_filesystem(self, dir_data_root):
-        self.root_path = dir_data_root
-        self.dir_hr = os.path.join(self.root_path, self.args.dir_hr)
+        self.root_path = os.getcwd()
+        self.dir_hr = os.path.join(self.root_path,'data', self.args.dir_hr)
         if not self.args.apply_field_data:
-            self.dir_lr = os.path.join(self.root_path, self.args.dir_lr)
+            self.dir_lr = os.path.join(self.root_path,'data', self.args.dir_lr)
         else:
             self.dir_lr = self.args.dir_lr
 
@@ -71,14 +71,8 @@ class SRData(data.Dataset):
 
         filename, _ = os.path.splitext(os.path.basename(f_lr)) # without suffix
 
-        lr = np.fromfile(f_lr, dtype=np.float32)
-        hr = np.fromfile(f_hr, dtype=np.float32)
-        if not self.args.apply_field_data:
-            lr = lr.reshape((128,128))
-        else:
-            shape = [int(x) for x in filename.split('_')[1].split('x')]
-            lr = lr.reshape(shape)
-        hr = hr.reshape((256,256))
+        lr = np.load(f_lr)
+        hr = np.load(f_hr)
 
         lr = np.rot90(lr, 3)
         hr = np.rot90(hr, 3)

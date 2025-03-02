@@ -1,5 +1,5 @@
 from decimal import Decimal
-import src.utility
+import src.utility as utility
 import torch
 import torch.nn.utils as utils
 from tqdm import tqdm
@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import src.data.common as common
 import pandas as pd
 from PIL import Image
+
+my_device  = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class Trainer():
     def __init__(self, args, loader, my_model,
@@ -21,7 +23,7 @@ class Trainer():
         self.model = my_model
         self.loss = my_loss
         self.lossv = my_lossv
-        self.optimizer = src.utility.make_optimizer(args, self.model)
+        self.optimizer = utility.make_optimizer(args, self.model)
 
         if self.args.load != '':
             self.optimizer.load(ckp.dir, epoch=len(ckp.log))
@@ -38,9 +40,9 @@ class Trainer():
         )
         self.loss.start_log()
         self.model.train()
-        device = torch.device('cpu')
+        device = my_device
 
-        timer_data, timer_model = src.utility.timer(), src.utility.timer()
+        timer_data, timer_model = utility.timer(), utility.timer()
         # TEMP
         for batch, (lr, hr, _, _1) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
@@ -87,14 +89,12 @@ class Trainer():
             self.lossv.start_log()
 
         scale = self.args.scale
-        timer_test =src.utility.timer()
+        timer_test = utility.timer()
         if self.args.save_results: self.ckp.begin_background()
         # self.deme_lovto()
         for (lr, hr, filename, params) in tqdm(self.loader_test, ncols=80):
             lr, hr = self.prepare(lr, hr)
-            print(filename," lr: shape: ", lr.shape, " min: " ,torch.min(lr), " max: ", torch.max(lr))
-            sr = self.model(lr.repeat(1,3,1,1))
-            print(filename, " sr: shape: ", sr.shape, " min: " ,torch.min(sr), " max: ", torch.max(sr))
+            sr = self.model(lr)
             # Assuming `lr` and `sr` are single-channel images for mode 'L'
             lr_img_array = lr.cpu().numpy()[0][0]  # Get the first channel if multi-channel
             sr_img_array = sr.cpu().numpy()[0][0]
@@ -135,18 +135,22 @@ class Trainer():
 
             plt.close()
             if not self.args.test_only:
+                if hr.shape[1] > 1:
+                    hr = hr[:, 1:2, :, :]
                 lossv = self.lossv(sr, hr)
 
             save_list = [sr]
             if not self.args.apply_field_data:
-                self.ckp.log[-1] += src.utility.calc_psnr(
+                if hr.shape[1] > 1:
+                    hr = hr[:, 1:2, :, :]
+                self.ckp.log[-1] +=  utility.calc_psnr(
                     sr, hr, scale
                 )
 
             if self.args.save_results:
                 self.ckp.save_results(filename[0], save_list, params)
 
-        self.deme_lovto()
+        # self.deme_lovto()
         if not self.args.apply_field_data:
             self.ckp.log[-1] /= len(self.loader_test)
             best = self.ckp.log.max(0)
@@ -178,7 +182,7 @@ class Trainer():
         torch.set_grad_enabled(True)
 
     def prepare(self, *args):
-        device = torch.device('cpu')
+        device = my_device
         return [a.to(device) for a in args]
 
     def terminate(self):
@@ -211,7 +215,7 @@ class Trainer():
 
         # Pass through the model
         print("DEMI lr: shape: ", lr.shape, " min: ", torch.min(lr), " max: ", torch.max(lr))
-        sr = self.model(lr.repeat(1,3,1,1))
+        sr = self.model(lr)
         print("DEMI sr: shape: ", sr.shape, " min: ", torch.min(sr), " max: ", torch.max(sr))
         # lr_img_array = lr.cpu().numpy()[0][0]
         # Assuming 'sr' is a tensor, visualize it using matplotlib
@@ -230,7 +234,7 @@ import torchvision.transforms as transforms
 
 
 def inference_single_image(model, image_path):
-    device = torch.device('cpu')
+    device = my_device
     model.eval()
 
     # Load and preprocess image

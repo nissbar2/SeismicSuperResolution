@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-from model import common
+from src.model import common
 
 def conv(in_f, out_f, kernel_size, stride=1, bias=True, pad='zero', downsample_mode='stride'):
     downsampler = None
