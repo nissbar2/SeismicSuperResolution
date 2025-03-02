@@ -49,7 +49,7 @@ parser.add_argument('--dir_hr', type=str, default='my_sx',
 parser.add_argument('--save_dir_suffix', type=str, default='syn',
                     help='save test result as: result-(save_dir_suffix)/, such as result-syn/')
 
-parser.add_argument('--data_range', type=str, default='1-150/151-194',
+parser.add_argument('--data_range', type=str, default='1-300/301-389',
                     help='train/test data range')
 parser.add_argument('--scale', type=int, default=2,
                     help='super resolution scale')
@@ -68,7 +68,7 @@ parser.add_argument('--loss', type=float, default=0.6,
                     help='loss function configuration, loss*MSSSIM+(1-loss)*L1')
 parser.add_argument('--test_every', type=int, default=1000,
                     help='do test per every N batches')
-parser.add_argument('--epochs', type=int, default=150,
+parser.add_argument('--epochs', type=int, default=150,  #TODO change back to 120 or 150
                     help='number of epochs to train')
 parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')

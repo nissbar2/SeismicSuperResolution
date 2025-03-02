@@ -10,7 +10,7 @@ class SRData(data.Dataset):
         self.train = train
         self.scale = args.scale
         # self.arr = self.get_arr()
-        self.arr = np.arange(0, 195) # np.fromfile('data/arr.dat', dtype=int)
+        self.arr = np.arange(0, 389) # np.fromfile('data/arr.dat', dtype=int)
 
         data_range = [r.split('-') for r in args.data_range.split('/')] # ex: self.data_range: 1-400/401-432
         data_range = data_range[0] if train else data_range[1]
@@ -28,7 +28,7 @@ class SRData(data.Dataset):
     def _scan(self):
         names_hr = sorted(glob.glob(os.path.join(self.dir_hr, '*.npy')))
         names_lr = sorted(glob.glob(os.path.join(self.dir_lr, '*.npy')))
-        
+
         names_hr = np.array(names_hr)[self.arr] # shuffle
         names_hr = names_hr[self.begin - 1: self.end]
 
@@ -41,10 +41,10 @@ class SRData(data.Dataset):
         return names_hr, names_lr
 
     def _set_filesystem(self, dir_data_root):
-        self.root_path = dir_data_root
-        self.dir_hr = os.path.join(self.root_path, self.args.dir_hr)
+        self.root_path = os.getcwd()
+        self.dir_hr = os.path.join(self.root_path,'data', self.args.dir_hr)
         if not self.args.apply_field_data:
-            self.dir_lr = os.path.join(self.root_path, self.args.dir_lr)
+            self.dir_lr = os.path.join(self.root_path,'data', self.args.dir_lr)
         else:
             self.dir_lr = self.args.dir_lr
 
@@ -55,7 +55,6 @@ class SRData(data.Dataset):
 
         pair = self.get_patch(*pair)
         pair_t = common.np2Tensor(*pair)
-
         return pair_t[0][0], pair_t[1][0], filename, params
 
     def __len__(self):

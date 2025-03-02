@@ -1,16 +1,13 @@
 import os
 
-from src.trainer import process_image
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
 import torch
 import numpy as np
-import utility
-import my_data as data
-import my_model
-import my_loss
-from option import args
-from my_trainer import Trainer
+import src.utility as utility
+import src.my_data as data
+import src.my_model as my_model
+import src.my_loss as my_loss
+from src.option import args
+from src.my_trainer import Trainer
 import segyio
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -26,6 +23,7 @@ def main():
 ############ Train ##############
     args.test_only = False
     args.save_results = False
+    args.pre_train = 'experiment/alpha6/model/model_best.pt'
     checkpoint = utility.checkpoint(args)
     loader = data.Data(args)
     _model = my_model.Model(args, checkpoint)
@@ -59,10 +57,10 @@ def main():
     # args.data_range = '1-1200/1451-1453'
     # args.dir_lr = '../data/field/'
     # args.apply_field_data = True
-    # args.pre_train = '../experiment/alpha6/model/my_model_weights.pt'
+    # args.pre_train = '../experiment/alpha6/model/model_best.pt'
     # checkpoint = utility.checkpoint(args)
     # loader = data.Data(args)
-    # _model = my_model.Model(args, checkpoint) # TODO Wont work until first layer is 3 channels
+    # _model = my_model.Model(args, checkpoint)
     # t = Trainer(args, loader, _model, ckp=checkpoint)
     # t.test()
     # return
@@ -74,7 +72,7 @@ def main():
 
     # t.test()
     # t.deme_lovto()
-    checkpoint.done()
+    # checkpoint.done()
 
 
 def read_segy_data(segy_file):
@@ -136,13 +134,16 @@ def load_trained_model_1_to_3(pre_train_path):
         weights[conv_bias_key] = weights[conv_bias_key].clone()
     # Save the updated weights
     print(f"Shape of {conv_weight_key}: {weights[conv_weight_key].shape}")
-    new_checkpoint_path = "../experiment/alpha6/model/my_model_weights.pt"
+    new_checkpoint_path = "experiment/alpha6/model/my_model_weights.pt"
     torch.save(weights, new_checkpoint_path)
 
     print(f"Modified weights saved to {new_checkpoint_path}")
 
 
 if __name__ == '__main__':
+    # print(torch.cuda.is_available())
+    # print(torch.cuda.device_count())
+    # print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No GPU found")
     main()
     # Load the SEGY file
     # segy_file = "../data/field/sliced_seismic_data4.segy"

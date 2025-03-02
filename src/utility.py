@@ -76,6 +76,7 @@ class checkpoint():
         if args.reset:
             os.system('rm -rf ' + self.dir)
             args.load = ''
+        self.dir = os.path.join('/cs/labs/werman/leeyam/sesmic/experiment', args.save if args.save else now)
 
         os.makedirs(self.dir, exist_ok=True)
         os.makedirs(self.get_path('model'), exist_ok=True)
@@ -138,8 +139,6 @@ class checkpoint():
         plt.close(fig)
 
     def begin_background(self):
-        # Queue是python标准库中的线程安全的队列（FIFO）实现,
-        # 提供了一个适用于多线程编程的先进先出的数据结构，即队列
         self.queue = Queue()
         self.process = [
             Process(target=bg_target, args=(self.queue,)) \
