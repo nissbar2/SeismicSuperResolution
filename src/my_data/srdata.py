@@ -10,7 +10,7 @@ class SRData(data.Dataset):
         self.train = train
         self.scale = args.scale
         # self.arr = self.get_arr()
-        self.arr = np.arange(0, 389) # np.fromfile('data/arr.dat', dtype=int)
+        self.arr = np.arange(0, 3149) # np.fromfile('data/arr.dat', dtype=int)
 
         data_range = [r.split('-') for r in args.data_range.split('/')] # ex: self.data_range: 1-400/401-432
         data_range = data_range[0] if train else data_range[1]
@@ -52,7 +52,6 @@ class SRData(data.Dataset):
         lr, hr, filename = self._load_file(idx)
         pair, params = common.normal(lr, hr)
         pair = common.set_channel(*pair)
-
         pair = self.get_patch(*pair)
         pair_t = common.np2Tensor(*pair)
         return pair_t[0][0], pair_t[1][0], filename, params

@@ -8,8 +8,8 @@ def get_patch(*args, patch_size=48, scale=2):
     ip = patch_size
     tp = ip * scale
 
-    ix = random.randrange(0, iw - ip + 1)
-    iy = random.randrange(0, ih - ip + 1)
+    ix = random.randrange(0, iw - ip)
+    iy = random.randrange(0, ih - ip)
 
     tx, ty = scale * ix, scale * iy
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --gres=gpu:1
-#SBATCH --time=6:0:0
+#SBATCH --time=16:0:0
 
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 OUTPUT_FILE="/cs/labs/werman/leeyam/sesmic/outputs/output_${TIMESTAMP}.log"

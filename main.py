@@ -23,7 +23,7 @@ def main():
 ############ Train ##############
     args.test_only = False
     args.save_results = False
-    args.pre_train = 'experiment/alpha6/model/model_best.pt'
+    args.pre_train = 'experiment/alpha6/model/my_model_weights3d.pt'
     checkpoint = utility.checkpoint(args)
     loader = data.Data(args)
     _model = my_model.Model(args, checkpoint)
@@ -144,54 +144,8 @@ if __name__ == '__main__':
     # print(torch.cuda.is_available())
     # print(torch.cuda.device_count())
     # print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No GPU found")
+    # directory = "/cs/labs/werman/leeyam/sesmic/data/my_nx2"
     main()
-    # Load the SEGY file
-    # segy_file = "../data/field/sliced_seismic_data4.segy"
-    # data = read_segy_data(segy_file)
-    #
-    # # Convert to numpy array and slice to 300x200
-    # patch = np.array(data)[200:500, 200:400].T  # Ensure this gives the desired shape (300x200)
-    #
-    # # Convert to an image using PIL
-    # sr_img_array = Image.fromarray(patch, mode='L')
-    # # Save as NPY file
-    # np.save("../data/field/output.npy", patch)
-    # # Save as image
-    # plt.figure(figsize=(10, 6))
-    # plt.imshow(patch, cmap='seismic', aspect='auto')
-    # plt.colorbar(label='Amplitude')
-    # plt.title('Seismic Patch')
-    # plt.xlabel('Trace')
-    # plt.ylabel('Time/Depth')
-    # plt.savefig("300_200.png", dpi=100, bbox_inches='tight')
-    # plt.close()
-
-
-    # # Visualization of raw data
-    # # fig = plt.figure(figsize=(18, 9))
-    # plt.imshow(data.T, cmap='gray')
-    # plt.gca().invert_xaxis()
-    # # fig.patch.set_alpha(0)
-    # plt.gca().patch.set_alpha(0)
-    # plt.tight_layout()
-    # plt.savefig(f"n-segy.png")
-    # plt.close()
-
-    # data = np.array(data, dtype=np.float32)
-    # output_file = "../data/field/american_egret_npy/output.npy"
-    # np.save(output_file, data)
-    # main()
-    # image = np.load("../data/field/american_egret_npy/output.npy")
-    # sr = model.Model.model(image)
-
-    # CHECK
-    # my_data = np.load('../data/field/output.npy')
-    # their_data = np.fromfile("../data/field\lulia_592x400.dat", dtype=np.float32)
-    # print(my_data.shape, my_data.min(), my_data.max())
-    # print(their_data.shape, their_data.min(), their_data.max())
-    # show_fourier2d_2_images(my_data,my_data)
-
-
 
 
 
